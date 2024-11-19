@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using DogsProject.Infrastructure.Data.Entities;
+
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DogsProject.Data
@@ -9,5 +11,7 @@ namespace DogsProject.Data
             : base(options)
         {
         }
+
+        public DbSet<Dog> Dogs { get; set; }
     }
 }
