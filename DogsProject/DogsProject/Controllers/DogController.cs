@@ -4,6 +4,7 @@ using DogsProject.Models.Dog;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DogsProject.Controllers
 {
@@ -19,9 +20,19 @@ namespace DogsProject.Controllers
 
 
         // GET: DogController
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            List<DogAllViewModel> dogs = await _context.Dogs
+                .Select(dogFromDb => new DogAllViewModel
+                {
+                    Id = dogFromDb.Id,
+                    Name = dogFromDb.Name,
+                    Age = dogFromDb.Age,
+                    Breed = dogFromDb.Breed,
+                    Picture = dogFromDb.Picture,
+                }).ToListAsync();
+
+            return View(dogs);
         }
 
         // GET: DogController/Details/5
