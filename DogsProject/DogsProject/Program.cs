@@ -1,4 +1,4 @@
-using DogsProject.Data;
+using DogsProject.Infrastructure;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

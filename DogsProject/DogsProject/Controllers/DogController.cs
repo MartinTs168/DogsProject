@@ -1,4 +1,4 @@
-﻿using DogsProject.Data;
+﻿using DogsProject.Infrastructure;
 using DogsProject.Infrastructure.Data.Entities;
 using DogsProject.Models.Dog;
 
@@ -36,9 +36,28 @@ namespace DogsProject.Controllers
         }
 
         // GET: DogController/Details/5
-        public ActionResult Details(int id)
+        [HttpGet]
+        public async Task<ActionResult> Details(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+
+            Dog? dogFromDb = await _context.Dogs.FindAsync(id);
+            if (dogFromDb == null)
+            {
+                return NotFound();
+            }
+            DogDetailsViewModel dog = new DogDetailsViewModel()
+            {
+                Id = dogFromDb.Id,
+                Name = dogFromDb.Name,
+                Age = dogFromDb.Age,
+                Breed = dogFromDb.Breed,
+                Picture = dogFromDb.Picture,
+            };
+            return View(dog);
         }
 
         // GET: DogController/Create
@@ -86,7 +105,7 @@ namespace DogsProject.Controllers
                 return NotFound();
             }
 
-            Dog? dogFromDb = await _context.Dogs.FindAsync(id);
+            Dog? dogFromDb = await _context.Dogs.FindAsync  (id);
             if(dogFromDb == null)
             {
                 return NotFound();
@@ -131,24 +150,45 @@ namespace DogsProject.Controllers
         }
 
         // GET: DogController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+
+            Dog? dogFromDb = await _context.Dogs.FindAsync(id);
+            if(dogFromDb == null)
+            {
+                return NotFound();
+            }
+
+            DogDetailsViewModel dog = new DogDetailsViewModel()
+            {
+                Id = dogFromDb.Id,
+                Name = dogFromDb.Name,
+                Age = dogFromDb.Age,
+                Breed = dogFromDb.Breed,
+                Picture = dogFromDb.Picture
+            };
+
+            return View(dog);
         }
 
         // POST: DogController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int id)
         {
-            try
+            Dog? dog = await _context.Dogs.FindAsync(id);
+            if(dog == null)
             {
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            catch
-            {
-                return View();
-            }
+
+            _context.Dogs.Remove(dog);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", "Dog");
         }
     }
 }

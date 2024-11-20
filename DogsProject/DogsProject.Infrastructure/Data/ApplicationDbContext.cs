@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace DogsProject.Data
+namespace DogsProject.Infrastructure
 {
     public class ApplicationDbContext : IdentityDbContext
     {
@@ -12,6 +12,6 @@ namespace DogsProject.Data
         {
         }
 
-        public DbSet<Dog> Dogs { get; set; }
+        public DbSet<Dog>? Dogs { get; set; }
     }
 }
