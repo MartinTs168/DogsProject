@@ -20,7 +20,7 @@ namespace DogsProject.Controllers
 
 
         // GET: DogController
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchStringBreed, string searchStringName)
         {
             List<DogAllViewModel> dogs = await _context.Dogs
                 .Select(dogFromDb => new DogAllViewModel
@@ -31,6 +31,19 @@ namespace DogsProject.Controllers
                     Breed = dogFromDb.Breed,
                     Picture = dogFromDb.Picture,
                 }).ToListAsync();
+
+            if(!String.IsNullOrEmpty(searchStringBreed) && !String.IsNullOrEmpty(searchStringName))
+            {
+                dogs = dogs.Where(d => d.Breed.Contains(searchStringBreed) && d.Name.Contains(searchStringName)).ToList();
+            }
+            else if(!String.IsNullOrEmpty(searchStringName))
+            {
+                dogs = dogs.Where(d => d.Name.Contains(searchStringName)).ToList();
+            }
+            else if (!String.IsNullOrEmpty(searchStringBreed))
+            {
+                dogs = dogs.Where(d => d.Breed.Contains(searchStringBreed)).ToList();
+            }
 
             return View(dogs);
         }
