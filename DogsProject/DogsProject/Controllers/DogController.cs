@@ -42,6 +42,7 @@ namespace DogsProject.Controllers
         }
 
         // GET: DogController/Create
+        [HttpGet]
         public ActionResult Create()
         {
             return View();
@@ -77,24 +78,56 @@ namespace DogsProject.Controllers
         }
 
         // GET: DogController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public async Task<ActionResult> Edit(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+
+            Dog? dogFromDb = await _context.Dogs.FindAsync(id);
+            if(dogFromDb == null)
+            {
+                return NotFound();
+            }
+
+            DogEditViewModel dog = new DogEditViewModel()
+            {
+                Id = dogFromDb.Id,
+                Name = dogFromDb.Name,
+                Age = dogFromDb.Age,
+                Breed = dogFromDb.Breed,
+                Picture = dogFromDb.Picture
+
+            };
+
+            return View(dog);
         }
 
         // POST: DogController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(int id, DogEditViewModel model)
         {
-            try
+            if(ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                Dog dog = new Dog()
+                {
+                    Id = id,
+                    Name = model.Name,
+                    Age = model.Age,
+                    Breed = model.Breed,
+                    Picture = model.Picture
+
+                };
+
+                _context.Dogs.Update(dog);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
             }
-            catch
-            {
-                return View();
-            }
+
+            return View(model);
         }
 
         // GET: DogController/Delete/5
