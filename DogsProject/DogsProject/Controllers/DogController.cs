@@ -1,4 +1,6 @@
-﻿using DogsProject.Infrastructure;
+﻿using DogsProject.Core.Contracts;
+using DogsProject.Core.Services;
+using DogsProject.Infrastructure;
 using DogsProject.Infrastructure.Data.Entities;
 using DogsProject.Models.Dog;
 
@@ -10,19 +12,19 @@ namespace DogsProject.Controllers
 {
     public class DogController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IDogService _dogService;
 
-        public DogController(ApplicationDbContext context)
+        public DogController(IDogService dogService)
         {
-            _context = context;
+            _dogService = dogService;
         }
 
 
 
         // GET: DogController
-        public async Task<IActionResult> Index(string searchStringBreed, string searchStringName)
+        public IActionResult Index(string searchStringBreed, string searchStringName)
         {
-            List<DogAllViewModel> dogs = await _context.Dogs
+            var dogs = _dogService.GetDogs(searchStringBreed, searchStringName)
                 .Select(dogFromDb => new DogAllViewModel
                 {
                     Id = dogFromDb.Id,
@@ -30,34 +32,17 @@ namespace DogsProject.Controllers
                     Age = dogFromDb.Age,
                     Breed = dogFromDb.Breed,
                     Picture = dogFromDb.Picture,
-                }).ToListAsync();
-
-            if(!String.IsNullOrEmpty(searchStringBreed) && !String.IsNullOrEmpty(searchStringName))
-            {
-                dogs = dogs.Where(d => d.Breed.Contains(searchStringBreed) && d.Name.Contains(searchStringName)).ToList();
-            }
-            else if(!String.IsNullOrEmpty(searchStringName))
-            {
-                dogs = dogs.Where(d => d.Name.Contains(searchStringName)).ToList();
-            }
-            else if (!String.IsNullOrEmpty(searchStringBreed))
-            {
-                dogs = dogs.Where(d => d.Breed.Contains(searchStringBreed)).ToList();
-            }
+                }).ToList();
 
             return View(dogs);
         }
 
         // GET: DogController/Details/5
         [HttpGet]
-        public async Task<ActionResult> Details(int? id)
+        public async Task<ActionResult> Details(int id)
         {
-            if(id == null)
-            {
-                return NotFound();
-            }
 
-            Dog? dogFromDb = await _context.Dogs.FindAsync(id);
+            Dog? dogFromDb = await _dogService.GetDogByIdAsync(id);
             if (dogFromDb == null)
             {
                 return NotFound();
@@ -87,18 +72,11 @@ namespace DogsProject.Controllers
         {
             if(ModelState.IsValid)
             {
-                Dog dog = new Dog
-                {
-                    Name = model.Name,
-                    Age  = model.Age,
-                    Breed = model.Breed,
-                    Picture = model.Picture,
-                };
+                var created = await _dogService.CreateAsync(model.Name, model.Age, model.Breed, model.Picture);
 
-                _context.Add(dog);
-                await _context.SaveChangesAsync();
+                
+                if(created) return RedirectToAction("Success");
 
-                return RedirectToAction("Success");
             }
 
             return View();
@@ -111,14 +89,10 @@ namespace DogsProject.Controllers
 
         // GET: DogController/Edit/5
         [HttpGet]
-        public async Task<ActionResult> Edit(int? id)
+        public async Task<ActionResult> Edit(int id)
         {
-            if(id == null)
-            {
-                return NotFound();
-            }
 
-            Dog? dogFromDb = await _context.Dogs.FindAsync  (id);
+            Dog? dogFromDb = await _dogService.GetDogByIdAsync(id);
             if(dogFromDb == null)
             {
                 return NotFound();
@@ -144,33 +118,20 @@ namespace DogsProject.Controllers
         {
             if(ModelState.IsValid)
             {
-                Dog dog = new Dog()
-                {
-                    Id = id,
-                    Name = model.Name,
-                    Age = model.Age,
-                    Breed = model.Breed,
-                    Picture = model.Picture
+                var updated = await _dogService.UpdateDog(id, model.Name, model.Age, model.Breed, model.Picture);
 
-                };
+                if (updated) return RedirectToAction("Success");
 
-                _context.Dogs.Update(dog);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
             }
 
             return View(model);
         }
 
         // GET: DogController/Delete/5
-        public async Task<ActionResult> Delete(int? id)
+        public async Task<ActionResult> Delete(int id)
         {
-            if(id == null)
-            {
-                return NotFound();
-            }
 
-            Dog? dogFromDb = await _context.Dogs.FindAsync(id);
+            Dog? dogFromDb = await _dogService.GetDogByIdAsync(id);
             if(dogFromDb == null)
             {
                 return NotFound();
@@ -191,17 +152,16 @@ namespace DogsProject.Controllers
         // POST: DogController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(int id, IFormCollection collection)
         {
-            Dog? dog = await _context.Dogs.FindAsync(id);
-            if(dog == null)
+            
+            var deleted = await _dogService.RemoveByIdAsync(id);
+           if (deleted)
             {
-                return NotFound();
+                return RedirectToAction("Index", "Dog");
             }
+           return View();
 
-            _context.Dogs.Remove(dog);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index", "Dog");
         }
     }
 }

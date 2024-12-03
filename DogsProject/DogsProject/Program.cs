@@ -1,3 +1,5 @@
+using DogsProject.Core.Contracts;
+using DogsProject.Core.Services;
 using DogsProject.Infrastructure;
 
 using Microsoft.AspNetCore.Identity;
@@ -26,6 +28,8 @@ namespace DogsProject
                 options.Password.RequiredLength = 5;
             }).AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddScoped<IDogService, DogService>();
 
             var app = builder.Build();
 

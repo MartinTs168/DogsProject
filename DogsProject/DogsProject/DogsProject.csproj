@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DogsProject.Infrastructure\DogsProject.Infrastructure.csproj" />
+    <ProjectReference Include="..\DogsProject.Core\DogsProject.Core.csproj" />
   </ItemGroup>
 
 </Project>
