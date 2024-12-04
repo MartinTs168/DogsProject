@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace DogsProject.Core.Services
 {
@@ -24,16 +25,16 @@ namespace DogsProject.Core.Services
             return await _context.Breeds.FindAsync(id);
         }
 
-        public List<Breed> GetBreeds()
+        public async Task<IEnumerable<Breed>> GetBreedsAsync()
         {
-            List<Breed> breeds = _context.Breeds.ToList();
+            var breeds = await _context.Breeds.ToListAsync();
             return breeds;
         }
 
-        public List<Dog> GetDogsByBreed(int breedId)
+        public async Task<IEnumerable<Dog>> GetDogsByBreedAsync(int breedId)
         {
-            return _context.Dogs
-                .Where(x => x.BreedId == breedId).ToList();
+            return await _context.Dogs
+                .Where(x => x.BreedId == breedId).ToListAsync();
         }
     }
 }

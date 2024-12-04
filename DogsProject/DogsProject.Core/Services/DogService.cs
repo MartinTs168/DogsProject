@@ -42,9 +42,9 @@ namespace DogsProject.Core.Services
             return await _context.Dogs.FindAsync(dogId);
         }
 
-        public List<Dog> GetDogs(string searchStringBreed, string searchStringName)
+        public async Task<IEnumerable<Dog>> GetDogsAsync(string searchStringBreed, string searchStringName)
         {
-            List<Dog> dogs = _context.Dogs.ToList();
+            var dogs = await _context.Dogs.ToListAsync();
 
             if (!String.IsNullOrEmpty(searchStringBreed) && !String.IsNullOrEmpty(searchStringName))
             {
@@ -63,9 +63,9 @@ namespace DogsProject.Core.Services
             return dogs;
         }
 
-        public List<Dog> GetDogs()
+        public async Task<IEnumerable<Dog>> GetDogsAsync()
         {
-            List<Dog> dogs = _context.Dogs.ToList();
+            var dogs = await _context.Dogs.ToListAsync();
             return dogs;
         }
 

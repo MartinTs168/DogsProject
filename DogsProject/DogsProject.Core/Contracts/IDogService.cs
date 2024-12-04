@@ -14,9 +14,9 @@ namespace DogsProject.Core.Contracts
         Task<bool> CreateAsync(string name, int age, int breedId, string? picture);
         Task<bool> UpdateDog(int dogId, string name, int age, int breedId, string? picture);
 
-        List<Dog> GetDogs();
+        Task<IEnumerable<Dog>> GetDogsAsync();
         Task<Dog> GetDogByIdAsync(int dogId);
         Task<bool> RemoveByIdAsync(int dogId);
-        List<Dog> GetDogs(string searchStringBreed, string searchStringName);
+        Task<IEnumerable<Dog>> GetDogsAsync(string searchStringBreed, string searchStringName);
     }
 }

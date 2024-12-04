@@ -10,8 +10,8 @@ namespace DogsProject.Core.Contracts
 {
     public interface IBreedService
     {
-        List<Breed> GetBreeds();
+        Task<IEnumerable<Breed>> GetBreedsAsync();
         Task<Breed?> GetBreedByIdAsync(int id);
-        List<Dog> GetDogsByBreed(int breedId);
+        Task<IEnumerable<Dog>> GetDogsByBreedAsync(int breedId);
     }
 }

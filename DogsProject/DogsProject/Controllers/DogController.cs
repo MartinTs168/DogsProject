@@ -25,17 +25,17 @@ namespace DogsProject.Controllers
 
 
         // GET: DogController
-        public IActionResult Index(string searchStringBreed, string searchStringName)
+        public async Task<IActionResult> Index(string searchStringBreed, string searchStringName)
         {
-            var dogs = _dogService.GetDogs(searchStringBreed, searchStringName)
-                .Select(dogFromDb => new DogAllViewModel
-                {
-                    Id = dogFromDb.Id,
-                    Name = dogFromDb.Name,
-                    Age = dogFromDb.Age,
-                    BreedName = dogFromDb.Breed.Name,
-                    Picture = dogFromDb.Picture,
-                }).ToList();
+            var dogsFromDb = await _dogService.GetDogsAsync(searchStringBreed, searchStringName);
+            var dogs =  dogsFromDb.Select(dogFromDb => new DogAllViewModel
+            {
+                Id = dogFromDb.Id,
+                Name = dogFromDb.Name,
+                Age = dogFromDb.Age,
+                BreedName = dogFromDb.Breed.Name,
+                Picture = dogFromDb.Picture,
+            }).ToList();
 
             return View(dogs);
         }
@@ -63,10 +63,11 @@ namespace DogsProject.Controllers
 
         // GET: DogController/Create
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var dog = new DogCreateViewModel();
-            dog.Breeds = _breedService.GetBreeds()
+            var breeds = await _breedService.GetBreedsAsync();
+            dog.Breeds = breeds
                 .Select(c => new BreedPairViewModel
                 {
                     Id = c.Id,
@@ -118,8 +119,9 @@ namespace DogsProject.Controllers
                 Picture = dogFromDb.Picture
 
             };
-
-            dog.Breeds = _breedService.GetBreeds()
+            
+            var breeds = await _breedService.GetBreedsAsync();
+            dog.Breeds = breeds
                 .Select(c => new BreedPairViewModel
                 {
                     Id = c.Id,
@@ -155,7 +157,7 @@ namespace DogsProject.Controllers
                 return NotFound();
             }
 
-            DogDetailsViewModel dog = new DogDetailsViewModel()
+            DogDetailsViewModel dog = new DogDetailsViewModel
             {
                 Id = dogFromDb.Id,
                 Name = dogFromDb.Name,
@@ -174,11 +176,11 @@ namespace DogsProject.Controllers
         {
             
             var deleted = await _dogService.RemoveByIdAsync(id);
-           if (deleted)
+            if (deleted)
             {
                 return RedirectToAction("Index", "Dog");
             }
-           return View();
+            return View();
 
         }
     }
