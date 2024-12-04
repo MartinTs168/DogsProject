@@ -1,6 +1,7 @@
 using DogsProject.Core.Contracts;
 using DogsProject.Core.Services;
 using DogsProject.Infrastructure;
+using DogsProject.Infrastructure.Data.Extensions;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,14 +10,15 @@ namespace DogsProject
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseLazyLoadingProxies()
+                .UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<IdentityUser>(options => { 
@@ -29,9 +31,11 @@ namespace DogsProject
             }).AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddScoped<IBreedService, BreedService>();
             builder.Services.AddScoped<IDogService, DogService>();
 
             var app = builder.Build();
+            await app.PrepareDatabase();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -58,7 +62,7 @@ namespace DogsProject
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             app.MapRazorPages();
 
-            app.Run();
+            await app.RunAsync();
         }
     }
 }

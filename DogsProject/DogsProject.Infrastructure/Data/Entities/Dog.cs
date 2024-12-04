@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -18,8 +19,10 @@ namespace DogsProject.Infrastructure.Data.Entities
         [Range(0, 30)]
         public int Age { get; set; }
 
-        [Required, MaxLength(50)]
-        public string Breed { get; set; } = null!;
+        [Required]
+        public int BreedId { get; set; }
+        [ForeignKey(nameof(BreedId))]
+        public Breed Breed { get; set; } = null!;
         public string? Picture { get; set; }
     }
 }

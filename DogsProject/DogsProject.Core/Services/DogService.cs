@@ -15,19 +15,21 @@ namespace DogsProject.Core.Services
     public class DogService : IDogService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IBreedService _breedService;
 
-        public DogService(ApplicationDbContext context)
+        public DogService(ApplicationDbContext context, IBreedService breedService)
         {
             _context = context;
+            _breedService = breedService;
         }
 
-        public async Task<bool> CreateAsync(string name, int age, string breed, string picture)
+        public async Task<bool> CreateAsync(string name, int age, int breedId, string? picture)
         {
             Dog item = new Dog
             {
                 Name = name,
                 Age = age,
-                Breed = breed,
+                Breed = await _breedService.GetBreedByIdAsync(breedId),
                 Picture = picture
             };
 
@@ -46,7 +48,7 @@ namespace DogsProject.Core.Services
 
             if (!String.IsNullOrEmpty(searchStringBreed) && !String.IsNullOrEmpty(searchStringName))
             {
-                dogs = dogs.Where(d => d.Breed.Contains(searchStringBreed) && d.Name.Contains(searchStringName)).ToList();
+                dogs = dogs.Where(d => d.Breed.Name.Contains(searchStringBreed) && d.Name.Contains(searchStringName)).ToList();
             }
 
             else if (!String.IsNullOrEmpty(searchStringName))
@@ -55,7 +57,7 @@ namespace DogsProject.Core.Services
             }
             else if (!String.IsNullOrEmpty(searchStringBreed))
             {
-                dogs = dogs.Where(d => d.Breed.Contains(searchStringBreed)).ToList();
+                dogs = dogs.Where(d => d.Breed.Name.Contains(searchStringBreed)).ToList();
             }
 
             return dogs;
@@ -79,7 +81,7 @@ namespace DogsProject.Core.Services
             return await _context.SaveChangesAsync() != 0;
         }
 
-        public async Task<bool> UpdateDog(int dogId, string name, int age, string breed, string picture)
+        public async Task<bool> UpdateDog(int dogId, string name, int age, int breedId, string picture)
         {
             var dog = await GetDogByIdAsync(dogId);
 
@@ -87,7 +89,7 @@ namespace DogsProject.Core.Services
 
             dog.Name = name;
             dog.Age = age;
-            dog.Breed = breed;
+            dog.Breed = await _breedService.GetBreedByIdAsync(breedId);
             dog.Picture = picture;
             _context.Update(dog);
             return await _context.SaveChangesAsync() != 0;

@@ -11,8 +11,8 @@ namespace DogsProject.Core.Contracts
 {
     public interface IDogService
     {
-        Task<bool> CreateAsync(string name, int age, string breed, string picture);
-        Task<bool> UpdateDog(int dogId, string name, int age, string breed, string picture);
+        Task<bool> CreateAsync(string name, int age, int breedId, string? picture);
+        Task<bool> UpdateDog(int dogId, string name, int age, int breedId, string? picture);
 
         List<Dog> GetDogs();
         Task<Dog> GetDogByIdAsync(int dogId);

@@ -2,6 +2,7 @@
 using DogsProject.Core.Services;
 using DogsProject.Infrastructure;
 using DogsProject.Infrastructure.Data.Entities;
+using DogsProject.Models.Breed;
 using DogsProject.Models.Dog;
 
 using Microsoft.AspNetCore.Http;
@@ -13,10 +14,12 @@ namespace DogsProject.Controllers
     public class DogController : Controller
     {
         private readonly IDogService _dogService;
+        private readonly IBreedService _breedService;
 
-        public DogController(IDogService dogService)
+        public DogController(IDogService dogService, IBreedService breedService)
         {
             _dogService = dogService;
+            _breedService = breedService;
         }
 
 
@@ -30,7 +33,7 @@ namespace DogsProject.Controllers
                     Id = dogFromDb.Id,
                     Name = dogFromDb.Name,
                     Age = dogFromDb.Age,
-                    Breed = dogFromDb.Breed,
+                    BreedName = dogFromDb.Breed.Name,
                     Picture = dogFromDb.Picture,
                 }).ToList();
 
@@ -52,7 +55,7 @@ namespace DogsProject.Controllers
                 Id = dogFromDb.Id,
                 Name = dogFromDb.Name,
                 Age = dogFromDb.Age,
-                Breed = dogFromDb.Breed,
+                Breed = dogFromDb.Breed.Name,
                 Picture = dogFromDb.Picture,
             };
             return View(dog);
@@ -60,9 +63,18 @@ namespace DogsProject.Controllers
 
         // GET: DogController/Create
         [HttpGet]
-        public ActionResult Create()
+        public IActionResult Create()
         {
-            return View();
+            var dog = new DogCreateViewModel();
+            dog.Breeds = _breedService.GetBreeds()
+                .Select(c => new BreedPairViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                }).ToList();
+
+            return View(dog);
+
         }
 
         // POST: DogController/Create
@@ -72,10 +84,10 @@ namespace DogsProject.Controllers
         {
             if(ModelState.IsValid)
             {
-                var created = await _dogService.CreateAsync(model.Name, model.Age, model.Breed, model.Picture);
+                var created = await _dogService.CreateAsync(model.Name, model.Age, model.BreedId, model.Picture);
 
                 
-                if(created) return RedirectToAction("Success");
+                if(created) return RedirectToAction(nameof(Index));
 
             }
 
@@ -103,10 +115,16 @@ namespace DogsProject.Controllers
                 Id = dogFromDb.Id,
                 Name = dogFromDb.Name,
                 Age = dogFromDb.Age,
-                Breed = dogFromDb.Breed,
                 Picture = dogFromDb.Picture
 
             };
+
+            dog.Breeds = _breedService.GetBreeds()
+                .Select(c => new BreedPairViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                }).ToList();
 
             return View(dog);
         }
@@ -118,9 +136,9 @@ namespace DogsProject.Controllers
         {
             if(ModelState.IsValid)
             {
-                var updated = await _dogService.UpdateDog(id, model.Name, model.Age, model.Breed, model.Picture);
+                var updated = await _dogService.UpdateDog(id, model.Name, model.Age, model.BreedId, model.Picture);
 
-                if (updated) return RedirectToAction("Success");
+                if (updated) return RedirectToAction("Index");
 
             }
 
@@ -142,7 +160,7 @@ namespace DogsProject.Controllers
                 Id = dogFromDb.Id,
                 Name = dogFromDb.Name,
                 Age = dogFromDb.Age,
-                Breed = dogFromDb.Breed,
+                Breed = dogFromDb.Breed.Name,
                 Picture = dogFromDb.Picture
             };
 

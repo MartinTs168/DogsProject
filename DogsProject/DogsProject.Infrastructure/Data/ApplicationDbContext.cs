@@ -10,8 +10,10 @@ namespace DogsProject.Infrastructure
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+            Database.EnsureCreated();
         }
 
         public DbSet<Dog>? Dogs { get; set; }
+        public DbSet<Breed> Breeds { get; set; } = null!;
     }
 }
