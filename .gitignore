@@ -397,5 +397,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-#Jetbrains idea folder contents
-.idea/*
+# IntelliJ IDEA project files
+.idea/
+*.iml
