@@ -398,4 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 #Jetbrains idea folder contents
-idea/*
+.idea/*
