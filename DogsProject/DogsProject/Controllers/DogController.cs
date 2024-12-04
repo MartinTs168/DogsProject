@@ -55,7 +55,7 @@ namespace DogsProject.Controllers
                 Id = dogFromDb.Id,
                 Name = dogFromDb.Name,
                 Age = dogFromDb.Age,
-                Breed = dogFromDb.Breed.Name,
+                BreedName = dogFromDb.Breed.Name,
                 Picture = dogFromDb.Picture,
             };
             return View(dog);
@@ -160,7 +160,7 @@ namespace DogsProject.Controllers
                 Id = dogFromDb.Id,
                 Name = dogFromDb.Name,
                 Age = dogFromDb.Age,
-                Breed = dogFromDb.Breed.Name,
+                BreedName = dogFromDb.Breed.Name,
                 Picture = dogFromDb.Picture
             };
 
