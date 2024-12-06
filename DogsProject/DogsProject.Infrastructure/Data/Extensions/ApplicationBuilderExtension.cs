@@ -1,13 +1,7 @@
 ﻿using DogsProject.Infrastructure.Data.Entities;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace DogsProject.Infrastructure.Data.Extensions
 {
@@ -15,19 +9,18 @@ namespace DogsProject.Infrastructure.Data.Extensions
     {
         public static async Task<IApplicationBuilder> PrepareDatabase(this IApplicationBuilder app)
         {
-            await using var serviceScope = app.ApplicationServices.CreateAsyncScope();
-
+            using var serviceScope = app.ApplicationServices.CreateScope();
             var services = serviceScope.ServiceProvider;
 
             var data = services.GetRequiredService<ApplicationDbContext>();
-            SeedBreeds(data);
+            await SeedBreeds(data);
 
             return app;
         }
 
-        private async static void SeedBreeds(ApplicationDbContext data)
+        private static async Task SeedBreeds(ApplicationDbContext data)
         {
-            if (data.Breeds.Any())
+            if (await data.Breeds.AnyAsync())
             {
                 return;
             }
@@ -42,7 +35,6 @@ namespace DogsProject.Infrastructure.Data.Extensions
             });
 
             await data.SaveChangesAsync();
-
         }
     }
 }

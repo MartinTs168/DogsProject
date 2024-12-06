@@ -13,6 +13,6 @@ namespace DogsProject.Infrastructure.Data.Entities
         public int Id { get; set; }
         [Required]
         public string Name { get; set; } = null!;
-        public IEnumerable<Dog> Dogs { get; set; } = null!;
+        public virtual IEnumerable<Dog> Dogs { get; set; } = null!;
     }
 }

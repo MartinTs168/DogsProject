@@ -22,7 +22,7 @@ namespace DogsProject.Infrastructure.Data.Entities
         [Required]
         public int BreedId { get; set; }
         [ForeignKey(nameof(BreedId))]
-        public Breed Breed { get; set; } = null!;
+        public virtual Breed Breed { get; set; } = null!;
         public string? Picture { get; set; }
     }
 }

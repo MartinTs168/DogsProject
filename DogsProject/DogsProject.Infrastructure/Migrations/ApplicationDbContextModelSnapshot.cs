@@ -47,7 +47,7 @@ namespace DogsProject.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Dogs");
+                    b.ToTable("Dogs", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
