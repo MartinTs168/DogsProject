@@ -12,6 +12,8 @@ namespace DogsProject.Infrastructure.Data.Extensions
         {
             using var serviceScope = app.ApplicationServices.CreateScope();
             var services = serviceScope.ServiceProvider;
+            await RoleSeeder(services);
+            await SeedAdministrator(services);
 
             var data = services.GetRequiredService<ApplicationDbContext>();
             await SeedBreeds(data);
@@ -45,6 +47,41 @@ namespace DogsProject.Infrastructure.Data.Extensions
             string[] roleNames = { "Administrator", "Client"};
 
             IdentityResult roleResult;
+
+            foreach (var role in roleNames)
+            {
+                var roleExists = await roleManager.RoleExistsAsync(role);
+
+                if (!roleExists)
+                {
+                    roleResult = await roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
+        }
+
+        private static async Task SeedAdministrator(IServiceProvider serviceProvider)
+        {
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            if (await userManager.FindByNameAsync("admin") == null)
+            {
+                ApplicationUser user = new ApplicationUser
+                {
+                    UserName = "admin",
+                    FirstName = "admin",
+                    LastName = "admin",
+                    Email = "admin@admin.com",
+                    EmailConfirmed = true
+                };
+
+                var result = await userManager.CreateAsync(user, "Admin123456");
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(user, "Administrator");
+                }
+            }
+            
         }
     }
 }
