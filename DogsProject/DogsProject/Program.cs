@@ -1,6 +1,7 @@
 using DogsProject.Core.Contracts;
 using DogsProject.Core.Services;
 using DogsProject.Infrastructure;
+using DogsProject.Infrastructure.Data.Entities;
 using DogsProject.Infrastructure.Data.Extensions;
 
 using Microsoft.AspNetCore.Identity;
@@ -21,7 +22,7 @@ namespace DogsProject
                 .UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => { 
+            builder.Services.AddDefaultIdentity<ApplicationUser>(options => { 
                 options.SignIn.RequireConfirmedAccount = false;
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
